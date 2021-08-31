@@ -63,6 +63,7 @@ void handleRecv(int& epollfd, int& sockfd, char* buffer);
 void handleLogin(json data, int& clientfd, int& epollfd);
 void handleReg(json data, int& clientfd, int& epollfd);
 void handleMsg(json data, int& clientfd, int& epollfd);
+void handleEmailQ(json data, int& clientfd, int& epollfd);
 void sendJsonPkg(int& targetfd, json data, int& epollfd);
 
 void addEvent(int& epollfd, int& sockfd, int state);
@@ -202,6 +203,9 @@ void handleRecv(int& epollfd, int& sockfd, char* buffer) {
         case "msg"_HASH:
             handleMsg(data, sockfd, epollfd);
             break;
+        case "emailQuery"_HASH:
+            handleEmailQ(data, sockfd, epollfd);
+            break;
         case "_EXIT"_HASH:
             spdlog::warn("recv _EXIT");
             exit_flag = 42;
@@ -279,6 +283,19 @@ void handleMsg(json data, int& clientfd, int& epollfd) {
     }
     pendingMsg[target].push_back(data);
 }
+void handleEmailQ(json data, int& clientfd, int& epollfd) {
+    json::array_t qlist = data["data"];
+    json qresult(json::value_t::array);
+    for (auto& qitem : qlist) {
+        auto usrinfo = usrData.find(qitem);
+        if (usrinfo != usrData.end()) {
+            qresult+={qitem,usrData[qitem].value("email","")};
+        }
+    }
+    json reply={{"type","emailQuery_re"},{"data",qresult}};
+    sendJsonPkg(clientfd, reply, epollfd);
+}
+
 void sendJsonPkg(int& targetfd, json data, int& epollfd) {
     spdlog::debug("Send json: {}", data.dump());
     //strcpy(buffer,data.dump().c_str());
