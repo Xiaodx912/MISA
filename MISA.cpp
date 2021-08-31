@@ -64,6 +64,7 @@ void handleLogin(json data, int& clientfd, int& epollfd);
 void handleReg(json data, int& clientfd, int& epollfd);
 void handleMsg(json data, int& clientfd, int& epollfd);
 void handleEmailQ(json data, int& clientfd, int& epollfd);
+void handleHeartbeat(json data, int& clientfd, int& epollfd);
 void sendJsonPkg(int& targetfd, json data, int& epollfd);
 
 void addEvent(int& epollfd, int& sockfd, int state);
@@ -207,6 +208,9 @@ void handleRecv(int& epollfd, int& sockfd, char* buffer) {
         case "emailQuery"_HASH:
             handleEmailQ(data, sockfd, epollfd);
             break;
+        case "_heartbeat"_HASH:
+            handleHeartbeat(data, sockfd, epollfd);
+            break;
         case "_EXIT"_HASH:
             spdlog::warn("recv _EXIT");
             exit_flag = 42;
@@ -301,6 +305,9 @@ void handleEmailQ(json data, int& clientfd, int& epollfd) {
     }
     json reply={{"type","emailQuery_re"},{"data",qresult}};
     sendJsonPkg(clientfd, reply, epollfd);
+}
+void handleHeartbeat(json data, int& clientfd, int& epollfd){
+    sendJsonPkg(clientfd, data, epollfd);
 }
 
 void sendJsonPkg(int& targetfd, json data, int& epollfd) {
