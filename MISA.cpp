@@ -271,6 +271,9 @@ void handleReg(json data, int& clientfd, int& epollfd) {
     spdlog::debug("New user {} reg", username);
 }
 void handleMsg(json data, int& clientfd, int& epollfd) {
+    if(onlineClientFtoU.find(to_string(targetfd))==onlineClientFtoU.end()){
+        return;
+    }
     auto target = data.value("to", "");
     if (target == "")
         return;
@@ -285,12 +288,15 @@ void handleMsg(json data, int& clientfd, int& epollfd) {
     pendingMsg[target].push_back(data);
 }
 void handleEmailQ(json data, int& clientfd, int& epollfd) {
+    if(onlineClientFtoU.find(to_string(targetfd))==onlineClientFtoU.end()){
+        return;
+    }
     json::array_t qlist = data["data"];
     json qresult(json::value_t::array);
     for (string qitem : qlist) {
         auto usrinfo = usrData.find(qitem);
         if (usrinfo != usrData.end()) {
-            qresult.push_back({qitem,usrData[qitem].value("email","")});
+            qresult.push_back({{"name",qitem},{"email",usrData[qitem].value("email","")}});
         }
     }
     json reply={{"type","emailQuery_re"},{"data",qresult}};
