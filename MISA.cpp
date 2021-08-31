@@ -271,7 +271,7 @@ void handleReg(json data, int& clientfd, int& epollfd) {
     spdlog::debug("New user {} reg", username);
 }
 void handleMsg(json data, int& clientfd, int& epollfd) {
-    if(onlineClientFtoU.find(to_string(targetfd))==onlineClientFtoU.end()){
+    if(onlineClientFtoU.find(to_string(clientfd))==onlineClientFtoU.end()){
         return;
     }
     auto target = data.value("to", "");
@@ -288,7 +288,7 @@ void handleMsg(json data, int& clientfd, int& epollfd) {
     pendingMsg[target].push_back(data);
 }
 void handleEmailQ(json data, int& clientfd, int& epollfd) {
-    if(onlineClientFtoU.find(to_string(targetfd))==onlineClientFtoU.end()){
+    if(onlineClientFtoU.find(to_string(clientfd))==onlineClientFtoU.end()){
         return;
     }
     json::array_t qlist = data["data"];
