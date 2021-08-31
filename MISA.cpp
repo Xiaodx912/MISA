@@ -289,7 +289,7 @@ void handleEmailQ(json data, int& clientfd, int& epollfd) {
     for (string qitem : qlist) {
         auto usrinfo = usrData.find(qitem);
         if (usrinfo != usrData.end()) {
-            qresult+={qitem,usrData[qitem].value("email","")};
+            qresult.push_back({qitem,usrData[qitem].value("email","")});
         }
     }
     json reply={{"type","emailQuery_re"},{"data",qresult}};
