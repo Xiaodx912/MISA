@@ -286,7 +286,7 @@ void handleMsg(json data, int& clientfd, int& epollfd) {
 void handleEmailQ(json data, int& clientfd, int& epollfd) {
     json::array_t qlist = data["data"];
     json qresult(json::value_t::array);
-    for (auto& qitem : qlist) {
+    for (string qitem : qlist) {
         auto usrinfo = usrData.find(qitem);
         if (usrinfo != usrData.end()) {
             qresult+={qitem,usrData[qitem].value("email","")};
