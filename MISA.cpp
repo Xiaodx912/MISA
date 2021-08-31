@@ -91,6 +91,7 @@ int main() {
         msg_datai.close();
     }
     doEpoll(sockfd); //main event loop
+    shutdown(sockfd,2);
     ofstream user_datao("user_data.json");
     user_datao << usrData << endl;
     user_datao.close();
